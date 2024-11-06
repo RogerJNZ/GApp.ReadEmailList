@@ -7,6 +7,7 @@ Do you want a list of all Gmail emails and their associated size? This Apps Scri
 1. Create a new Google Sheet in Google Drive
    
 2. Click on **Extenstions** then **Apps Script**
+
 ![image](https://github.com/user-attachments/assets/3a2d6b9b-e0d0-441d-b630-5d9c6a329d63)
 
 4. Paste the **ReadEmailList.js** code into the **Code.JS** section of the Apps Script
