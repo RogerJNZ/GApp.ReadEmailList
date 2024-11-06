@@ -13,5 +13,6 @@ Do you want a list of all Gmail emails and their associated size? This Apps Scri
 If you have a large number of emails the script will probably exceed the script time limit before it has read all of your emails. 
 Simply click Run for the script to continue from the last Email it read
 
+To find the related email in Gmail, copy the text in the Gmail Search column and paste into the Gmail search
 
  
