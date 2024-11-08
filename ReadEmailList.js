@@ -16,10 +16,11 @@ Read Email Messages
   
  If the script times out or the API limit is reached, around 25k,
  the script can be simply be rerun and it will continue from at the last line.
-
+  
  Updates
- 27 Oct 2024  RJ    Create EmailList worksheet if it doesn't exist. Force update of sheet after every block
- 04 Nov 2024  RJ    Refactored to reduce code. Added Gmail Search column
+ 27 Oct 2024  RJ  Create EmailList worksheet if it doesn't exist. Force update of sheet after every block
+ 04 Nov 2024  RJ  Refactored code. Added Gmail Search column
+ 08 Nov 2024  RJ  Changed Size to MB and added conditional formatting to highlight large Emails
 */
 
 function readEmailMessages() {
@@ -27,8 +28,10 @@ function readEmailMessages() {
   var threadPage = 0;        // 0 is first page
   var threadBlockSize = 50;  // Number of threads to read before writing to the spreadsheet
   var newThread = "";        // Flag new a new Thread has started
+  // Sheet Details
+  var header = [["Page","Thread", "#","From","To", "Date","Subject", "Size (MB)","New Thread", "Gmail Search"]];
   // Use the value in this field to search for the related email in Gmail  
-  var gmailSearch = '=INDIRECT("F"&ROW()) & " after:" & TEXT(INDIRECT("E"&ROW())-1,"YYYY/MM/DD") & " before:" & TEXT(INDIRECT("E"&ROW())+1,"YYYY/MM/DD")';
+  var gmailSearch = '=INDIRECT("G"&ROW()) & " after:" & TEXT(INDIRECT("F"&ROW())-1,"YYYY/MM/DD") & " before:" & TEXT(INDIRECT("F"&ROW())+1,"YYYY/MM/DD")';
 
   // Get the EmailList sheet or create a new one
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("EmailList");
@@ -43,9 +46,25 @@ function readEmailMessages() {
     var data = sheet.getRange(line, 1, 1, sheet.getLastColumn()).getValues();  
     threadPage = data[0][0] +1; // Restart after last page
   } else {
-    var header = [["threadPage","Thread", "#","Sender","Date","Subject", "Size (bytes)","New Thread", "Gmail Search"]];
     sheet.getRange(1, 1, 1, header[0].length).setValues(header).setFontWeight("bold");
-    SpreadsheetApp.flush(); // Force write of the last Invoice values to the sheet 
+    SpreadsheetApp.flush(); // Force write 
+    var rules = []; //sheet.getConditionalFormatRules();
+    lastRow = sheet.getLastRow();
+    var range = sheet.getRange("H:H");
+    var rule = SpreadsheetApp.newConditionalFormatRule()
+      .whenNumberGreaterThanOrEqualTo(10)
+      .setBackground("#f4c7ce")
+      .setRanges([range])
+      .build();        
+    rules.push(rule);
+    rule = SpreadsheetApp.newConditionalFormatRule()
+      .whenNumberGreaterThanOrEqualTo(4)
+      .setBackground("#fce8b2")
+      .setRanges([range])
+      .build();        
+    rules.push(rule);
+    sheet.setConditionalFormatRules(rules);
+    SpreadsheetApp.flush(); // Force write 
   }
   
   // Read blocks of threads i.e. email + replies
@@ -64,7 +83,8 @@ function readEmailMessages() {
   
       // Loop through the emails in a conversation thread
       for (var i = 0; i < messages.length; i++) {
-        var messagesDetails = [threadPage, threadCount, line++, messages[i].getFrom(), messages[i].getDate(), messages[i].getSubject(), messages[i].getRawContent().length, newThread, gmailSearch];
+        emailSize =  Math.round(messages[i].getRawContent().length/1024/1024,2);
+        var messagesDetails = [threadPage, threadCount, line++, messages[i].getFrom(), messages[i].getTo(), messages[i].getDate(), messages[i].getSubject(), emailSize, newThread, gmailSearch];
         newThread = "";
         messageLines.push(messagesDetails);
       }
