@@ -10,9 +10,11 @@ Do you want a list of all Gmail emails and their associated size? This Apps Scri
 
 ![image](https://github.com/user-attachments/assets/3a2d6b9b-e0d0-441d-b630-5d9c6a329d63)
 
-4. Paste the **ReadEmailList.js** code into the **Code.JS** section of the Apps Script
+3. Paste the **ReadEmailList.js** code into the **Code.JS** section of the Apps Script
 ![image](https://github.com/user-attachments/assets/aea89069-8964-472d-a11d-12b690900e58)
 
+4. Add **appsscript.json** to reduce permissions required. https://developers.google.com/apps-script/concepts/scopes
+   
 5. Click **Run**
 
 6. A new sheet will be created called **EmailList** which will be populated with you emails.
